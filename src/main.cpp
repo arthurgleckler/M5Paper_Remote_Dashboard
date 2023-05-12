@@ -2,10 +2,10 @@
 #include <WiFi.h>
 #include "my_settings.h"
 
-//#define MY_SCREEN_WIDTH 960
-//#define MY_SCREEN_HEIGHT 540
-#define MY_SCREEN_WIDTH 540
-#define MY_SCREEN_HEIGHT 960
+#define MY_SCREEN_WIDTH 960
+#define MY_SCREEN_HEIGHT 540
+// #define MY_SCREEN_WIDTH 540
+// #define MY_SCREEN_HEIGHT 960
 
 
 // resolution of device is 960x540 (landscape format), no rotation
@@ -123,7 +123,6 @@ String buildUrl() {
 
 void setup() {
     M5.begin(false, false, false, true, true);
-    M5.EPD.SetRotation(90);
     M5.EPD.Clear(false); // false, since background image is written with highest quality first
     // init RTC, clear all pending alarms
     M5.RTC.begin();
@@ -143,7 +142,7 @@ void setup() {
         String url = buildUrl();
         ESP_LOGV("setup", "Fetching image from %s", url.c_str());
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
-        imageCanvas.drawJpgUrl(url);
+        imageCanvas.drawPngUrl(url.c_str());
         M5.EPD.Clear(true);
         imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16); // <> Try UPDATE_MODE_GLD16.  See <https://docs.m5stack.com/en/api/m5paper/epd_canvas>.
     }

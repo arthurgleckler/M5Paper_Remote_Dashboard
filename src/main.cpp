@@ -139,15 +139,13 @@ void setup() {
 
     setupTime(); // sync NTP time if required and connected
 
-    if (WiFi.status() == WL_CONNECTED) {    
+    if (WiFi.status() == WL_CONNECTED) {
         String url = buildUrl();
         ESP_LOGV("setup", "Fetching image from %s", url.c_str());
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
         imageCanvas.drawJpgUrl(url);
         M5.EPD.Clear(true);
-        imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16);
-    } else {
-        M5.EPD.Clear(true);
+        imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16); // <> Try UPDATE_MODE_GLD16.  See <https://docs.m5stack.com/en/api/m5paper/epd_canvas>.
     }
 
     WiFi.disconnect(true, true);
@@ -168,7 +166,7 @@ int waitTimeToNextWakeupInSeconds() {
     M5.RTC.getDate(&rtcDate);
 
     int waitTime = 60 - rtcTime.sec; // to next full minute
-    waitTime += (15 - (rtcTime.min + 1) % 15) * 60; // to next full quarter hour
+    waitTime += ((15 - (rtcTime.min + 1) % 15) + 1) * 60; // to next full quarter hour
     return waitTime;
 }
 
@@ -205,7 +203,7 @@ void rtcSleepByWakeupTime() {
     }
 
     rtcTime.sec = 0;
-    rtcTime.min = (rtcTime.min / 15 + 1) * 15; // next full 15 min
+    rtcTime.min = (rtcTime.min / 15 + 1) * 15 + 1; // next full 15 min
     while (rtcTime.min >= 60) {
         rtcTime.hour++;
         rtcTime.min -= 60;
@@ -226,8 +224,8 @@ void rtcSleepByWakeupTime() {
 void loop() {
     ESP_LOGD("loop", "Looping...");
 
-    flushTime();
-    flushBattery();
+    // flushTime();
+    // flushBattery();
 
     // shut down and go to sleep. need to re-read time since the above could have taken some time
     int waitTimeSeconds = waitTimeToNextWakeupInSeconds();

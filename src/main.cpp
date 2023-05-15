@@ -119,7 +119,7 @@ void setup() {
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
         imageCanvas.drawPngUrl(MY_URL);
         M5.EPD.Clear(true);
-        imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16); // <> Try UPDATE_MODE_GLD16.  See <https://docs.m5stack.com/en/api/m5paper/epd_canvas>.
+        imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16);
     }
 
     WiFi.disconnect(true, true);

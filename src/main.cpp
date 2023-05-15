@@ -4,12 +4,7 @@
 
 #define MY_SCREEN_WIDTH 960
 #define MY_SCREEN_HEIGHT 540
-// #define MY_SCREEN_WIDTH 540
-// #define MY_SCREEN_HEIGHT 960
 
-
-// resolution of device is 960x540 (landscape format), no rotation
-M5EPD_Canvas batteryCanvas(&M5.EPD);
 M5EPD_Canvas imageCanvas(&M5.EPD);
 
 char timeStrbuff[64];
@@ -32,13 +27,13 @@ void readBattery(uint32_t& batteryVoltage, uint32_t& batteryPercentage) {
     batteryPercentage = (uint32_t)(fBatteryPercent * 100);
 }
 
-void flushBattery() {
+void drawBattery() {
     uint32_t batteryVoltage, batteryPercentage;
+
     readBattery(batteryVoltage, batteryPercentage);
-    // trailing spaces to overwrite any previous artifacts of 1% < 10% < 100%
-    sprintf(batteryStrbuff, "%dmV (%d%%)  ", batteryVoltage, batteryPercentage);
-    batteryCanvas.drawString(batteryStrbuff, 0, 0);
-    batteryCanvas.pushCanvas(10, MY_SCREEN_HEIGHT - batteryCanvas.height() - 10, UPDATE_MODE_DU4);
+
+    sprintf(batteryStrbuff, "%d%%",batteryPercentage);
+    imageCanvas.drawString(batteryStrbuff, 360, 345);
 }
 
 void setupTime() {
@@ -101,16 +96,15 @@ void setup() {
     if (WiFi.status() == WL_CONNECTED) {
         ESP_LOGV("setup", "Fetching image from %s", MY_URL);
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
+	imageCanvas.setTextFont(1);
+	imageCanvas.setTextSize(3);
         imageCanvas.drawPngUrl(MY_URL);
+	drawBattery();
         M5.EPD.Clear(true);
         imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16);
     }
 
     WiFi.disconnect(true, true);
-
-    batteryCanvas.createCanvas(230, 35);
-    batteryCanvas.setTextFont(1);
-    batteryCanvas.setTextSize(3);
 }
 
 int waitTimeToNextWakeupInSeconds() {
@@ -177,8 +171,6 @@ void rtcSleepByWakeupTime() {
 
 void loop() {
     ESP_LOGD("loop", "Looping...");
-
-    // flushBattery();
 
     // shut down and go to sleep. need to re-read time since the above could have taken some time
     int waitTimeSeconds = waitTimeToNextWakeupInSeconds();

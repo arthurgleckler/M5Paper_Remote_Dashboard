@@ -97,30 +97,6 @@ void setupTime() {
     M5.RTC.setDate(&rtcDate);
 }
 
-String buildUrl() {
-    rtc_date_t rtcDate; rtc_time_t  rtcTime;
-    readRtc(rtcDate, rtcTime);
-    uint32_t batteryVoltage, batteryPercentage;
-    readBattery(batteryVoltage, batteryPercentage);
-
-    String strVoltage, strBatteryPercent;
-    strVoltage.concat(batteryVoltage);
-    strBatteryPercent.concat(batteryPercentage);
-
-    char rtcdatetimeBuf[64];
-    sprintf(rtcdatetimeBuf, "%04d-%02d-%02dT%02d:%02d:%02d",
-            rtcDate.year, rtcDate.mon, rtcDate.day, rtcTime.hour, rtcTime.min, rtcTime.sec);
-
-    String url(MY_URL_TEMPLATE);
-    url.replace("{mac}", WiFi.macAddress());
-    url.replace("{voltage}", strVoltage);
-    url.replace("{batterypercent}", strBatteryPercent);
-    url.replace("{rtcdatetime}", rtcdatetimeBuf);
-    url.replace("{width}", String(MY_SCREEN_WIDTH));
-    url.replace("{height}", String(MY_SCREEN_HEIGHT));
-    return url;
-}
-
 void setup() {
     M5.begin(false, false, false, true, true);
     M5.EPD.Clear(false); // false, since background image is written with highest quality first
@@ -139,10 +115,9 @@ void setup() {
     setupTime(); // sync NTP time if required and connected
 
     if (WiFi.status() == WL_CONNECTED) {
-        String url = buildUrl();
-        ESP_LOGV("setup", "Fetching image from %s", url.c_str());
+        ESP_LOGV("setup", "Fetching image from %s", MY_URL);
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
-        imageCanvas.drawPngUrl(url.c_str());
+        imageCanvas.drawPngUrl(MY_URL);
         M5.EPD.Clear(true);
         imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16); // <> Try UPDATE_MODE_GLD16.  See <https://docs.m5stack.com/en/api/m5paper/epd_canvas>.
     }

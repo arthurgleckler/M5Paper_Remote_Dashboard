@@ -9,7 +9,6 @@
 
 
 // resolution of device is 960x540 (landscape format), no rotation
-M5EPD_Canvas timeCanvas(&M5.EPD);
 M5EPD_Canvas batteryCanvas(&M5.EPD);
 M5EPD_Canvas imageCanvas(&M5.EPD);
 
@@ -31,21 +30,6 @@ void readBattery(uint32_t& batteryVoltage, uint32_t& batteryPercentage) {
         fBatteryPercent = 1;
     }
     batteryPercentage = (uint32_t)(fBatteryPercent * 100);
-}
-
-void flushTime() {
-    rtc_date_t rtcDate; rtc_time_t rtcTime;
-    readRtc(rtcDate, rtcTime);
-    //sprintf(timeStrbuff, "%d/%02d/%02d %02d:%02d:%02d", rtcDate.year,
-    //        rtcDate.mon, rtcDate.day, rtcTime.hour, rtcTime.min, rtcTime.sec);
-    sprintf(timeStrbuff, "%02d/%02d %02d:%02d:%02d",
-            rtcDate.mon, rtcDate.day, rtcTime.hour, rtcTime.min, rtcTime.sec);
-
-    timeCanvas.drawString(timeStrbuff, 0, 0);
-    timeCanvas.pushCanvas(
-        MY_SCREEN_WIDTH - timeCanvas.width() - 10,
-        MY_SCREEN_HEIGHT - timeCanvas.height() - 10,
-        UPDATE_MODE_DU4);
 }
 
 void flushBattery() {
@@ -124,10 +108,6 @@ void setup() {
 
     WiFi.disconnect(true, true);
 
-    timeCanvas.createCanvas(260, 35);
-    timeCanvas.setTextFont(1);
-    timeCanvas.setTextSize(3);
-
     batteryCanvas.createCanvas(230, 35);
     batteryCanvas.setTextFont(1);
     batteryCanvas.setTextSize(3);
@@ -198,7 +178,6 @@ void rtcSleepByWakeupTime() {
 void loop() {
     ESP_LOGD("loop", "Looping...");
 
-    // flushTime();
     // flushBattery();
 
     // shut down and go to sleep. need to re-read time since the above could have taken some time

@@ -98,7 +98,7 @@ void setup() {
         imageCanvas.createCanvas(MY_SCREEN_WIDTH, MY_SCREEN_HEIGHT);
 	imageCanvas.setTextFont(1);
 	imageCanvas.setTextSize(3);
-        imageCanvas.drawPngUrl(MY_URL);
+	imageCanvas.drawJpgUrl(MY_URL);
 	drawBattery();
         M5.EPD.Clear(true);
         imageCanvas.pushCanvas(0, 0, UPDATE_MODE_GC16);

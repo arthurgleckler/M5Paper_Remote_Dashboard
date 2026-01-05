@@ -85,10 +85,16 @@ void setup() {
     M5.RTC.setAlarmIRQ(RTC_Date(-1, -1, -1, -1), RTC_Time(-1, -1, -1)); // see https://github.com/m5stack/M5EPD/issues/26 why we need to use this version
 
     WiFi.begin(MY_WIFI_SSID, MY_WIFI_PASSWORD);
-    int retry = 10; // try up to 5 seconds
+    int retry = 40; // try up to 20 seconds
     while (WiFi.status() != WL_CONNECTED && retry-- > 0) {
         delay(500);
         Serial.print(".");
+    }
+    Serial.println();
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("WiFi connected!");
+    } else {
+        Serial.println("WiFi connection failed!");
     }
 
     setupTime(); // sync NTP time if required and connected
